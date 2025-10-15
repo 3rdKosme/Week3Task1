@@ -5,6 +5,6 @@ namespace Week3Task1.DTOs;
 
 public record CreateAuthorDTO
 {
-    [Required, MinLength(2)] string Name;
+    public string Name { get; set; }
     public DateOnly dateOfBirth { get; set; }
 }
