@@ -4,9 +4,10 @@ namespace Week3Task1.Repositories.Interfaces;
 
 public interface IAuthorRepository
 {
-    public Task<IEnumerable<Author>> GetAllAsync();
-    public Task<Author?> GetByIdAsync(int id);
-    public Task<int> CreateAsync(Author author);
-    public Task<bool> UpdateAsync(Author author);
-    public Task<bool> DeleteAsync(int id);
+    public IEnumerable<Author> GetAll();
+    public Author? GetById(int id);
+    public int Create(Author author);
+    public bool Update(Author author);
+    public bool Delete(int id);
+    public bool Exists(int id);
 }

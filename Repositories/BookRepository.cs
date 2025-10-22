@@ -3,29 +3,30 @@ using Week3Task1.Repositories.Interfaces;
 
 namespace Week3Task1.Repositories;
 
-public class BookRepository(List<Book> books) : IBookRepository
+public class BookRepository : IBookRepository
 {
-    private readonly List<Book> _books = books;
+    private static readonly List<Book> _books = new List<Book>();
+    private static int _nextId = 1;
 
-    public async Task<IEnumerable<Book>> GetAllAsync()
+    public IEnumerable<Book> GetAll()
     {
         return _books.ToList().AsReadOnly();
     }
 
-    public async Task<Book?> GetByIdAsync(int id)
+    public Book? GetById(int id)
     {
         var book = _books.FirstOrDefault(x => x.Id == id);
         return book;
     }
 
-    public async Task<int> CreateAsync(Book book)
+    public int Create(Book book)
     {
+        book.Id = _nextId++;
         _books.Add(book);
-        int id = _books.FirstOrDefault(x => x.Id == book.Id).Id;
-        return id;
+        return book.Id;
     }
 
-    public async Task<bool> UpdateAsync(Book book)
+    public bool Update(Book book)
     {
         int id = _books.FindIndex(x => x.Id == book.Id);
         if (id != -1)
@@ -36,14 +37,9 @@ public class BookRepository(List<Book> books) : IBookRepository
         return false;
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public bool Delete(int id)
     {
-        int idInList = _books.FindIndex(x => x.Id == id);
-        if (idInList != -1)
-        {
-            _books.RemoveAt(idInList);
-            return true;
-        }
-        return false;
+        var removed = _books.RemoveAll(x => x.Id == id) > 0;
+        return removed;
     }
 }

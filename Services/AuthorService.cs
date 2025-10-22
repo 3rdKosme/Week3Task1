@@ -1,9 +1,8 @@
 using Week3Task1.Models;
-using Week3Task1.Repositories;
 using Week3Task1.Repositories.Interfaces;
 using Week3Task1.Services.Interfaces;
 using Week3Task1.DTOs;
-using Microsoft.AspNetCore.Mvc.Formatters;
+using Week3Task1.Helpers;
 
 namespace Week3Task1.Services;
 
@@ -11,31 +10,31 @@ public class AuthorService(IAuthorRepository authorRepository) : IAuthorService
 {
     private readonly IAuthorRepository _authorRepository = authorRepository;
 
-    public async Task<IEnumerable<Author>> GetAllAuthorsAsync()
+    public IEnumerable<Author> GetAllAuthors()
     {
-        return await _authorRepository.GetAllAsync();
+        return _authorRepository.GetAll();
     }
 
-    public async Task<Author?> GetAuthorById(int id)
+    public Author? GetAuthorById(int id)
     {
-        CheckId(id);
-        return await _authorRepository.GetByIdAsync(id);
+        ValidationHelper.CheckId(id);
+        return _authorRepository.GetById(id);
     }
 
-    public async Task<int> AddAuthorAsync(CreateAuthorDTO dto)
+    public int AddAuthor(CreateAuthorDTO dto)
     {
+        CheckDateOfBirth((DateOnly)dto.DateOfBirth);
         var author = new Author
         {
             Name = dto.Name,
-            DateOfBirth = dto.dateOfBirth
+            DateOfBirth = dto.DateOfBirth
         };
-        return await _authorRepository.CreateAsync(author);
+        return _authorRepository.Create(author);
     }
 
-    public async Task<bool> UpdateAuthorAsync(UpdateAuthorDTO dto, int id)
+    public bool UpdateAuthor(UpdateAuthorDTO dto, int id)
     {
-        CheckId(id);
-        var existingAuthor = await _authorRepository.GetByIdAsync(id);
+        var existingAuthor = _authorRepository.GetById(id);
 
         if (existingAuthor == null) {
             throw new ArgumentNullException($"Автора с ID = {id} не существует.");
@@ -46,27 +45,28 @@ public class AuthorService(IAuthorRepository authorRepository) : IAuthorService
             existingAuthor.Name = dto.Name;
         }
 
-        if(dto.dateOfBirth is not null)
+        if(dto.DateOfBirth is not null)
         {
-            existingAuthor.DateOfBirth = (DateOnly)dto.dateOfBirth;
+            CheckDateOfBirth((DateOnly)dto.DateOfBirth);
+            existingAuthor.DateOfBirth = (DateOnly)dto.DateOfBirth;
         }
 
-        return await _authorRepository.UpdateAsync(existingAuthor);
+        return _authorRepository.Update(existingAuthor);
     }
 
-    public async Task<bool> DeleteAuthorAsync(int id)
+    public bool DeleteAuthor(int id)
     {
-        CheckId(id);
-        return await _authorRepository.DeleteAsync(id);
+        ValidationHelper.CheckId(id);
+        return _authorRepository.Delete(id);
     }
 
-    private static void CheckId(int id)
+    private void CheckDateOfBirth(DateOnly dateOfBirth)
     {
-        if(id <= 0)
+        var minDate = new DateOnly(0001, 1, 1);
+
+        if(dateOfBirth < minDate || dateOfBirth > DateOnly.FromDateTime(DateTime.Now))
         {
-            throw new ArgumentException("ID должен быть целым положительным числом.");
+            throw new ArgumentException("Некорректная дата рождения.");
         }
     }
-
-
 }

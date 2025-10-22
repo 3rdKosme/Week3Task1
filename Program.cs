@@ -1,25 +1,62 @@
+using Microsoft.OpenApi.Models;
+using Week3Task1.Services;
+using Week3Task1.Services.Interfaces;
+using Week3Task1.Repositories;
+using Week3Task1.Repositories.Interfaces;
+using Microsoft.AspNetCore.Diagnostics;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Week3Task1",
+        Version = "v1",
+        Description = "Система управления библиотекой"
+    });
+});
+builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<IAuthorService, AuthorService>();
+
+builder.Services.AddScoped<IBookService, BookService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Week3Task1 API v1");
+        options.RoutePrefix = "swagger";
+    });
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler("/error");
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.MapControllers();
 
-app.UseRouting();
+app.Map("/error", (HttpContext context, ILogger<Program> logger) =>
+{
+    var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+    var exception = exceptionHandlerFeature?.Error;
+    var path = exceptionHandlerFeature?.Path ?? "Неизвестный путь";
 
-app.UseAuthorization();
+    logger.LogError(exception, "Необрабатываемое исключение возникло на {Path}", path);
 
-app.MapRazorPages();
-
+    return Results.Problem(
+            title: "Непредвиденная ошибка.",
+            detail: "Повторите попытку позже или свяжитесь с поддержкой.",
+            statusCode: 500,
+            type: "https://httpstatuses.com/500"
+        );
+});
 app.Run();

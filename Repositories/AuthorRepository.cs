@@ -3,30 +3,30 @@ using Week3Task1.Repositories.Interfaces;
 
 namespace Week3Task1.Repositories;
 
-public class AuthorRepository(List<Author> authors) : IAuthorRepository
+public class AuthorRepository : IAuthorRepository
 {
-    private readonly List<Author> _authors = authors;
-    private int _nextId = 1;
+    private static readonly List<Author> _authors = new List<Author>();
+    private static int _nextId = 1;
 
-    public async Task<IEnumerable<Author>> GetAllAsync()
+    public IEnumerable<Author> GetAll()
     {
         return _authors.ToList().AsReadOnly();
     }
 
-    public async Task<Author?> GetByIdAsync(int id)
+    public Author? GetById(int id)
     {
         var user = _authors.FirstOrDefault(x => x.Id == id);
         return user;
     }
 
-    public async Task<int> CreateAsync(Author author)
+    public int Create(Author author)
     {
         author.Id = _nextId++;
         _authors.Add(author);
         return author.Id;
     }
 
-    public async Task<bool> UpdateAsync(Author author)
+    public bool Update(Author author)
     {
         int id = _authors.FindIndex(x => x.Id == author.Id);
         if (id != -1) { 
@@ -36,9 +36,14 @@ public class AuthorRepository(List<Author> authors) : IAuthorRepository
         return false;
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public bool Delete(int id)
     {
         var removed = _authors.RemoveAll(x => x.Id == id) > 0;
         return removed;
+    }
+
+    public bool Exists(int id)
+    {
+        return _authors.Any(x => x.Id == id);
     }
 }
