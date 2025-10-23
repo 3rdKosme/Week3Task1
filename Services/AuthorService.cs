@@ -37,7 +37,7 @@ public class AuthorService(IAuthorRepository authorRepository) : IAuthorService
         var existingAuthor = _authorRepository.GetById(id);
 
         if (existingAuthor == null) {
-            throw new ArgumentNullException($"Автора с ID = {id} не существует.");
+            throw new ArgumentNullException($"Author with ID = {id} doesn't exist.");
         }
 
         if(dto.Name is not null)
@@ -66,7 +66,7 @@ public class AuthorService(IAuthorRepository authorRepository) : IAuthorService
 
         if(dateOfBirth < minDate || dateOfBirth > DateOnly.FromDateTime(DateTime.Now))
         {
-            throw new ArgumentException("Некорректная дата рождения.");
+            throw new ArgumentException("Incorrect birth date.");
         }
     }
 }

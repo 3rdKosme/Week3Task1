@@ -6,7 +6,7 @@ public static class ValidationHelper
     {
         if (id <= 0)
         {
-            throw new ArgumentException("ID должен быть целым положительным числом.");
+            throw new ArgumentException("ID must be a positive integer");
         }
     }
 }

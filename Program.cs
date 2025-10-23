@@ -15,7 +15,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "Week3Task1",
         Version = "v1",
-        Description = "Система управления библиотекой"
+        Description = "Library Management System"
     });
 });
 builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
@@ -48,13 +48,13 @@ app.Map("/error", (HttpContext context, ILogger<Program> logger) =>
 {
     var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerPathFeature>();
     var exception = exceptionHandlerFeature?.Error;
-    var path = exceptionHandlerFeature?.Path ?? "Неизвестный путь";
+    var path = exceptionHandlerFeature?.Path ?? "Unknown path";
 
-    logger.LogError(exception, "Необрабатываемое исключение возникло на {Path}", path);
+    logger.LogError(exception, "An unprocessed exception occurred on {Path}", path);
 
     return Results.Problem(
-            title: "Непредвиденная ошибка.",
-            detail: "Повторите попытку позже или свяжитесь с поддержкой.",
+            title: "Unexpected error.",
+            detail: "Please try again later or contact support.",
             statusCode: 500,
             type: "https://httpstatuses.com/500"
         );

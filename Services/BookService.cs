@@ -41,7 +41,7 @@ public class BookService(IBookRepository bookRepository, IAuthorRepository autho
 
         if (existingBook == null)
         {
-            throw new ArgumentNullException($"Книги с таким Id (id = {id}) не существует.");
+            throw new ArgumentNullException($"Book with this Id (id = {id}) doesn't exist.");
         }
 
         if(dto.Title is not null)
@@ -72,7 +72,7 @@ public class BookService(IBookRepository bookRepository, IAuthorRepository autho
     {
         if(!_authorRepository.Exists(id))
         {
-            throw new ArgumentNullException($"Автора с Id = {id} не существует.");
+            throw new ArgumentNullException($"Author with Id = {id} doesn't exist.");
         }
     }
 
@@ -80,7 +80,7 @@ public class BookService(IBookRepository bookRepository, IAuthorRepository autho
     {
         if(year > DateTime.UtcNow.Year)
         {
-            throw new ArgumentException($"Некорректный год публикации.");
+            throw new ArgumentException($"Incorrect publication date.");
         }
     }
 }
