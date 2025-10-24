@@ -4,7 +4,7 @@ namespace Week3Task1.DTOs;
 
 public record CreateBookDTO
 {
-    [Required(ErrorMessage = "Название обязательно.")]
+    [Required(ErrorMessage = "Title is required.")]
     [MinLength(2)]
     [MaxLength(200)]
     public string Title { get; set; }

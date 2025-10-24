@@ -1,12 +1,16 @@
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Mvc;
 using Week3Task1.Services;
 using Week3Task1.Services.Interfaces;
 using Week3Task1.Repositories;
 using Week3Task1.Repositories.Interfaces;
+using Week3Task1.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
+using System.ComponentModel.DataAnnotations;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddProblemDetails();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -21,7 +25,6 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
-
 builder.Services.AddScoped<IBookService, BookService>();
 
 var app = builder.Build();
@@ -34,29 +37,38 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Week3Task1 API v1");
         options.RoutePrefix = "swagger";
     });
-    app.UseDeveloperExceptionPage();
-}
-else
-{
-    app.UseExceptionHandler("/error");
 }
 
+app.UseExceptionHandler("/error");
+
+app.Map("/error", (HttpContext context) =>
+{
+    var ex = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+
+    return ex switch
+    {
+        Week3Task1.Exceptions.ValidationException vEx => Results.Problem(
+            detail: vEx.Message,
+            statusCode: vEx.StatusCode,
+            title: "Validation failed."),
+
+        NotFoundException nEx => Results.Problem(
+            detail: nEx.Message,
+            statusCode: nEx.StatusCode,
+            title: "Resource not found."),
+
+        ArgumentException argEx => Results.Problem(
+            detail: argEx.Message,
+            statusCode: 400,
+            title: "Invalid argument."),
+
+        _ => Results.Problem(
+            detail: ex?.Message ?? "An unexpected error occured",
+            statusCode: 500,
+            title: "Internal Server Error.")
+    };
+});
 app.UseHttpsRedirection();
 app.MapControllers();
 
-app.Map("/error", (HttpContext context, ILogger<Program> logger) =>
-{
-    var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerPathFeature>();
-    var exception = exceptionHandlerFeature?.Error;
-    var path = exceptionHandlerFeature?.Path ?? "Unknown path";
-
-    logger.LogError(exception, "An unprocessed exception occurred on {Path}", path);
-
-    return Results.Problem(
-            title: "Unexpected error.",
-            detail: "Please try again later or contact support.",
-            statusCode: 500,
-            type: "https://httpstatuses.com/500"
-        );
-});
 app.Run();

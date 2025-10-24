@@ -3,6 +3,7 @@ using Week3Task1.Repositories.Interfaces;
 using Week3Task1.Services.Interfaces;
 using Week3Task1.DTOs;
 using Week3Task1.Helpers;
+using Week3Task1.Exceptions;
 
 namespace Week3Task1.Services;
 
@@ -37,7 +38,7 @@ public class AuthorService(IAuthorRepository authorRepository) : IAuthorService
         var existingAuthor = _authorRepository.GetById(id);
 
         if (existingAuthor == null) {
-            throw new ArgumentNullException($"Author with ID = {id} doesn't exist.");
+            throw new NotFoundException($"Author with ID = {id} doesn't exist.");
         }
 
         if(dto.Name is not null)
@@ -66,7 +67,7 @@ public class AuthorService(IAuthorRepository authorRepository) : IAuthorService
 
         if(dateOfBirth < minDate || dateOfBirth > DateOnly.FromDateTime(DateTime.Now))
         {
-            throw new ArgumentException("Incorrect birth date.");
+            throw new ValidationException("Incorrect birth date.");
         }
     }
 }

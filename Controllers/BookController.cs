@@ -22,14 +22,8 @@ public class BookController(IBookService bookService) : ControllerBase
     public ActionResult<Book> GetBookById(int id)
     {
         Book? book;
-        try
-        {
-            book = _bookService.GetBookById(id);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+
+        book = _bookService.GetBookById(id);
 
         if (book == null)
         {
@@ -46,13 +40,8 @@ public class BookController(IBookService bookService) : ControllerBase
             return BadRequest(ModelState);
         }
         int id;
-        try
-        {
-            id = _bookService.AddBook(dto);
-        }
-        catch (ArgumentException ex) { 
-            return BadRequest(ex.Message);
-        }
+
+        id = _bookService.AddBook(dto);
 
         return CreatedAtAction(nameof(GetBookById), new { id }, new { Id = id, Title = dto.Title, PublishedYear = dto.PublishedYear, AuthorId = dto.AuthorId });
     }
@@ -65,14 +54,8 @@ public class BookController(IBookService bookService) : ControllerBase
             return BadRequest(ModelState);
         }
         bool updated;
-        try
-        {
-            updated = _bookService.UpdateBook(dto, id);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        
+        updated = _bookService.UpdateBook(dto, id);
 
         if (updated)
         {

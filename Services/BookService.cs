@@ -3,6 +3,7 @@ using Week3Task1.Services.Interfaces;
 using Week3Task1.Repositories.Interfaces;
 using Week3Task1.Helpers;
 using Week3Task1.DTOs;
+using Week3Task1.Exceptions;
 
 namespace Week3Task1.Services;
 
@@ -41,7 +42,7 @@ public class BookService(IBookRepository bookRepository, IAuthorRepository autho
 
         if (existingBook == null)
         {
-            throw new ArgumentNullException($"Book with this Id (id = {id}) doesn't exist.");
+            throw new NotFoundException($"Book with this Id (id = {id}) doesn't exist.");
         }
 
         if(dto.Title is not null)
@@ -72,7 +73,7 @@ public class BookService(IBookRepository bookRepository, IAuthorRepository autho
     {
         if(!_authorRepository.Exists(id))
         {
-            throw new ArgumentNullException($"Author with Id = {id} doesn't exist.");
+            throw new NotFoundException($"Author with Id = {id} doesn't exist.");
         }
     }
 
@@ -80,7 +81,7 @@ public class BookService(IBookRepository bookRepository, IAuthorRepository autho
     {
         if(year > DateTime.UtcNow.Year)
         {
-            throw new ArgumentException($"Incorrect publication date.");
+            throw new ValidationException($"Incorrect publication date.");
         }
     }
 }

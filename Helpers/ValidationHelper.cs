@@ -1,3 +1,5 @@
+using Week3Task1.Exceptions;
+
 namespace Week3Task1.Helpers;
 
 public static class ValidationHelper
@@ -6,7 +8,7 @@ public static class ValidationHelper
     {
         if (id <= 0)
         {
-            throw new ArgumentException("ID must be a positive integer");
+            throw new ValidationException("ID must be a positive integer");
         }
     }
 }

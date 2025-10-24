@@ -22,13 +22,10 @@ public class AuthorController(IAuthorService authorService) : ControllerBase
     public ActionResult<Author> GetAuthorById(int id)
     {
         Author? author;
-        try
-        {
-            author = _authorService.GetAuthorById(id);
-        } catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        
+        
+        author = _authorService.GetAuthorById(id);
+        
         
         if (author == null) {
             return NotFound();
@@ -44,14 +41,8 @@ public class AuthorController(IAuthorService authorService) : ControllerBase
             return BadRequest(ModelState);
         }
         int id;
-        try
-        {
-            id = _authorService.AddAuthor(dto);
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        
+        id = _authorService.AddAuthor(dto);
 
         return CreatedAtAction(nameof(GetAuthorById), new { id }, new { Id = id, Name = dto.Name, DateOfBirth = dto.DateOfBirth });
     }
@@ -64,13 +55,9 @@ public class AuthorController(IAuthorService authorService) : ControllerBase
             return BadRequest(ModelState);
         }
         bool updated;
-        try
-        {
-            updated = _authorService.UpdateAuthor(dto, id);
-        }
-        catch (ArgumentException ex) { 
-            return BadRequest(ex.Message);
-        }
+        
+        updated = _authorService.UpdateAuthor(dto, id);
+
         if (updated) { 
             return Ok();
         }
